@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  zabbix-server:
+    image: zabbix/zabbix-server-pgsql:latest
+    container_name: zabbix-server
+    restart: always
+    ports:
+      - "10051:10051"
+    environment:
+      - DB_SERVER_HOST=db
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+    networks:
+      - zabbix-net
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-pgsql:latest
+    container_name: zabbix-web
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    user: "root"
+    environment:
+      - DB_SERVER_HOST=db
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ZBX_SERVER_HOST=zabbix-server
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./http.d:/etc/nginx/http.d:ro
+      - ./tls:/etc/nginx/tls:ro
+    depends_on:
+      - zabbix-server
+    networks:
+      - zabbix-net
+
+  db:
+    image: postgres:latest
+    container_name: zabbix-db
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_db_data:/var/lib/postgresql/data
+    networks:
+      - zabbix-net
+
+networks:
+  zabbix-net:
+    driver: bridge
+
+volumes:
+  postgres_db_data:
+    driver_opts:
+      type: none
+      device: ${POSTGRES_DATADIR}
+      o: bind
