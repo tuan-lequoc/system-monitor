@@ -1,0 +1,1604 @@
+{
+    "zabbix_export": {
+        "version": "6.4",
+        "template_groups": [
+            {
+                "uuid": "846977d1dfed4968bc5f8bdb363285bc",
+                "name": "Templates/Operating systems"
+            }
+        ],
+        "templates": [
+            {
+                "uuid": "6aa6810dc6704c0da8fc4785c10de2d0",
+                "template": "Linux server by admin",
+                "name": "Linux server by admin",
+                "groups": [
+                    {
+                        "name": "Templates/Operating systems"
+                    }
+                ],
+                "items": [
+                    {
+                        "uuid": "1291025a64e54b38a73c90d717505bbf",
+                        "name": "Linux: Maximum number of open file descriptors",
+                        "type": "TRAP",
+                        "key": "kernel.maxfiles",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "description": "It could be increased by using `sysctl` utility or modifying the file `/etc/sysctl.conf`.",
+                        "preprocessing": [
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "1d"
+                                ]
+                            }
+                        ],
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "system"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "69b3a5da86e24470a60ecc95ad6b44c4",
+                                "expression": "last(/Linux server by admin/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}",
+                                "name": "Linux: Configured max number of open filedescriptors is too low",
+                                "event_name": "Linux: Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})",
+                                "priority": "INFO",
+                                "tags": [
+                                    {
+                                        "tag": "scope",
+                                        "value": "performance"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "930d4195d9dd4d8eb80a8d1ad2f9c882",
+                        "name": "Linux: Maximum number of processes",
+                        "type": "TRAP",
+                        "key": "kernel.maxproc",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "description": "It could be increased by using `sysctl` utility or modifying the file `/etc/sysctl.conf`.",
+                        "preprocessing": [
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "1d"
+                                ]
+                            }
+                        ],
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "system"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "ed6ecd066e1b4cfa9ffd7ebf5deadcad",
+                                "expression": "last(/Linux server by admin/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}",
+                                "name": "Linux: Configured max number of processes is too low",
+                                "event_name": "Linux: Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN})",
+                                "priority": "INFO",
+                                "dependencies": [
+                                    {
+                                        "name": "Linux: Getting closer to process limit",
+                                        "expression": "last(/Linux server by admin/proc.num)/last(/Linux server by admin/kernel.maxproc)*100>80"
+                                    }
+                                ],
+                                "tags": [
+                                    {
+                                        "tag": "scope",
+                                        "value": "performance"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "9b99f610b93a42f2a640e0a21e0ae4a3",
+                        "name": "TCP connection est",
+                        "type": "TRAP",
+                        "key": "net.tcp[ESTABLISHED]",
+                        "delay": "0"
+                    },
+                    {
+                        "uuid": "f4fe36fc18ca48398137ec03258b7ebd",
+                        "name": "TCP connection listen",
+                        "type": "TRAP",
+                        "key": "net.tcp[LISTEN]",
+                        "delay": "0"
+                    },
+                    {
+                        "uuid": "cb68c82c2d224328b002b51a0cc7d2a7",
+                        "name": "Linux: Number of processes",
+                        "type": "TRAP",
+                        "key": "proc.num",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "system"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "e2b11add2a7d4e42ace4c3f2ee44cd78",
+                        "name": "Linux: Number of running processes",
+                        "type": "TRAP",
+                        "key": "proc.num[,,run]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "system"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "ea7875809963484da6f61f85af557633",
+                        "name": "Linux: Interrupts per second",
+                        "type": "TRAP",
+                        "key": "system.cpu.intr",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "preprocessing": [
+                            {
+                                "type": "CHANGE_PER_SECOND",
+                                "parameters": [
+                                    ""
+                                ]
+                            }
+                        ],
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "757da59c4f574443b26c2fa7ec12fd69",
+                        "name": "Linux: Load average (1m avg)",
+                        "type": "TRAP",
+                        "key": "system.cpu.load[avg1]",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "f553396c4a564e8081b16924dfb342d3",
+                        "name": "Linux: Load average (5m avg)",
+                        "type": "TRAP",
+                        "key": "system.cpu.load[avg5]",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "7a937f35e39f49d69403d2e41df3cfd1",
+                        "name": "Linux: Load average (15m avg)",
+                        "type": "TRAP",
+                        "key": "system.cpu.load[avg15]",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "8af913b7448c45a1a2e6cd40169e5cc4",
+                        "name": "Linux: Number of CPUs",
+                        "type": "TRAP",
+                        "key": "system.cpu.num",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "preprocessing": [
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "1d"
+                                ]
+                            }
+                        ],
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "e42d9e514fb5466ba787daf5c5fd7420",
+                        "name": "Linux: Context switches per second",
+                        "type": "TRAP",
+                        "key": "system.cpu.switches",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "preprocessing": [
+                            {
+                                "type": "CHANGE_PER_SECOND",
+                                "parameters": [
+                                    ""
+                                ]
+                            }
+                        ],
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "9699d5c4b9de40b4a47f81b787d87543",
+                        "name": "Linux: CPU temp",
+                        "type": "TRAP",
+                        "key": "system.cpu.temperature",
+                        "delay": "0",
+                        "value_type": "FLOAT",
+                        "units": "'c"
+                    },
+                    {
+                        "uuid": "ec482d94045142b2ac650bdf5ace1032",
+                        "name": "Linux: CPU utilization",
+                        "type": "TRAP",
+                        "key": "system.cpu.util",
+                        "delay": "0",
+                        "value_type": "FLOAT",
+                        "units": "%"
+                    },
+                    {
+                        "uuid": "2c94598e6e974b4ab0fcca55bba7e89d",
+                        "name": "Linux: CPU guest time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,guest]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "Guest time - the time spent on running a virtual CPU for a guest operating system.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "1c321c81a7034d4592148b1ad286be6b",
+                        "name": "Linux: CPU guest nice time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,guest_nice]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The time spent on running a niced guest (a virtual CPU for guest operating systems under the control of the Linux kernel).",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "670e4577057447a383a060dce465544a",
+                        "name": "Linux: CPU idle time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,idle]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The time the CPU has spent doing nothing.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "9118c95592aa4607bd932e185d06dd90",
+                        "name": "Linux: CPU interrupt time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,interrupt]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The amount of time the CPU has been servicing hardware interrupts.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "b44adf5b4e6d44c28382664476fee2f6",
+                        "name": "Linux: CPU iowait time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,iowait]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The amount of time the CPU has been waiting for I/O to complete.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "aea0dbcbb168437d92ed98c17c434309",
+                        "name": "Linux: CPU nice time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,nice]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The time the CPU has spent running users' processes that have been niced.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "79b2a8380784442eb5a2427a09d4b1f8",
+                        "name": "Linux: CPU softirq time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,softirq]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The amount of time the CPU has been servicing software interrupts.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "a3c1bad098054f66a1197dbce8a22a3b",
+                        "name": "Linux: CPU steal time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,steal]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The amount of \"stolen\" CPU from this virtual machine by the hypervisor for other tasks, such as running another virtual machine.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "ef437c3f45e0493e8d7fd8e519c65165",
+                        "name": "Linux: CPU system time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,system]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The time the CPU has spent running the kernel and its processes.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "04824d6fdace45a08a3295a9b993dbc5",
+                        "name": "Linux: CPU user time",
+                        "type": "TRAP",
+                        "key": "system.cpu.util[,user]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The time the CPU has spent running users' processes that are not niced.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "cpu"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "90fe2e064ebe4788a224d803d971bf40",
+                        "name": "Linux: Number of installed packages",
+                        "type": "TRAP",
+                        "key": "system.sw.packages.get",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.length()"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "12h"
+                                ]
+                            }
+                        ],
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "os"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "359d002663fb4afa8884272b1259ff62",
+                                "expression": "change(/Linux server by admin/system.sw.packages.get)<>0",
+                                "name": "Linux: Number of installed packages has been changed",
+                                "priority": "WARNING",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "scope",
+                                        "value": "notice"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "cf84cfca77914d5ab94082faa7c928fb",
+                        "name": "Linux: Free swap space",
+                        "type": "TRAP",
+                        "key": "system.swap.size[,free]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "units": "B",
+                        "description": "The free space of the swap volume/file expressed in bytes.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "memory"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "storage"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "4f23c2004ed1400f994a28ceafd40710",
+                        "name": "Linux: Free swap space in %",
+                        "type": "TRAP",
+                        "key": "system.swap.size[,pfree]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The free space of the swap volume/file expressed in %.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "memory"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "storage"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "c762c695b2e8455d848aaf45b33206b0",
+                        "name": "Linux: Total swap space",
+                        "type": "TRAP",
+                        "key": "system.swap.size[,total]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "units": "B",
+                        "description": "The total space of the swap volume/file expressed in bytes.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "memory"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "storage"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "653aeafd9877424882714d49a3069657",
+                        "name": "Linux: System uptime",
+                        "type": "TRAP",
+                        "key": "system.uptime",
+                        "delay": "0",
+                        "history": "7d",
+                        "trends": "0",
+                        "status": "DISABLED",
+                        "units": "uptime",
+                        "description": "The system uptime expressed in the following format: \"N days, hh:mm:ss\".",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "system"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "ec1dfcf96b4d4baa9ff3b4fa055c6dbe",
+                                "expression": "last(/Linux server by admin/system.uptime)<10m",
+                                "name": "Linux: {HOST.NAME} has been restarted",
+                                "event_name": "Linux: {HOST.NAME} has been restarted (uptime < 10m)",
+                                "priority": "WARNING",
+                                "description": "The host uptime is less than 10 minutes.",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "scope",
+                                        "value": "notice"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "b53f20e316d9472d85cd5bfba726e092",
+                        "name": "Linux: Number of logged in users",
+                        "type": "TRAP",
+                        "key": "system.users.num",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "description": "The number of users who are currently logged in.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "environment"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "b06adb5ff691490b9ad503c9a586b8f9",
+                        "name": "Linux: Available memory",
+                        "type": "TRAP",
+                        "key": "vm.memory.size[available]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "units": "B",
+                        "description": "The available memory:\n- in Linux - available = free + buffers + cache;\n- on other platforms calculation may vary.\n\nSee also Appendixes in Zabbix Documentation about parameters of the `vm.memory.size` item.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "memory"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "07c4e3735b654141985be940059cb102",
+                        "name": "Linux: Available memory in %",
+                        "type": "TRAP",
+                        "key": "vm.memory.size[pavailable]",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The available memory as percentage of the total. See also Appendixes in Zabbix Documentation about parameters of the `vm.memory.size` item.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "memory"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "69dec28f15194fa2a9b8dfd6ea3b2b0b",
+                        "name": "Linux: Total memory",
+                        "type": "TRAP",
+                        "key": "vm.memory.size[total]",
+                        "delay": "0",
+                        "history": "7d",
+                        "units": "B",
+                        "description": "The total memory expressed in bytes.",
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "memory"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "2bafa0ce55074078bd43e738ad95c222",
+                        "name": "Linux: Memory utilization",
+                        "type": "TRAP",
+                        "key": "vm.memory.utilization",
+                        "delay": "0",
+                        "history": "7d",
+                        "status": "DISABLED",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "description": "The percentage of used memory is calculated as `100-pavailable`.",
+                        "preprocessing": [
+                            {
+                                "type": "JAVASCRIPT",
+                                "parameters": [
+                                    "return (100-value);"
+                                ]
+                            }
+                        ],
+                        "tags": [
+                            {
+                                "tag": "component",
+                                "value": "memory"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "fb29068857a64f03ae4052c3ba610c24",
+                                "expression": "min(/Linux server by admin/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}",
+                                "name": "Linux: High memory utilization",
+                                "event_name": "Linux: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)",
+                                "priority": "AVERAGE",
+                                "description": "The system is running out of free memory.",
+                                "dependencies": [
+                                    {
+                                        "name": "Linux: Lack of available memory",
+                                        "expression": "max(/Linux server by admin/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux server by admin/vm.memory.size[total])>0"
+                                    }
+                                ],
+                                "tags": [
+                                    {
+                                        "tag": "scope",
+                                        "value": "capacity"
+                                    },
+                                    {
+                                        "tag": "scope",
+                                        "value": "performance"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "discovery_rules": [
+                    {
+                        "uuid": "43ed5747ea5e4165b3f5c20d280ee345",
+                        "name": "Network if",
+                        "type": "TRAP",
+                        "key": "net.if.discovery",
+                        "delay": "0",
+                        "item_prototypes": [
+                            {
+                                "uuid": "602854a46b9c4f3d9ff60fbe7a604369",
+                                "name": "Interface {#IFNAME}: Bits received",
+                                "type": "TRAP",
+                                "key": "net.if.in[{#IFNAME}]",
+                                "delay": "0",
+                                "units": "kbps",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return value * (1 / Math.pow(10, 3));"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "ee199dae2b6641978c57753f074609f5",
+                                "name": "Interface {#IFNAME}: Bits sent",
+                                "type": "TRAP",
+                                "key": "net.if.out[{#IFNAME}]",
+                                "delay": "0",
+                                "units": "kpps",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return -1 * value * (1 / Math.pow(10, 3));"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "8ee35cc3150640508b8b1bdc13d177ac",
+                        "name": "Mounted filesystem discovery",
+                        "type": "TRAP",
+                        "key": "vfs.fs.dependent.discovery",
+                        "delay": "0"
+                    }
+                ],
+                "tags": [
+                    {
+                        "tag": "class",
+                        "value": "os"
+                    },
+                    {
+                        "tag": "target",
+                        "value": "linux"
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$AGENT.TIMEOUT}",
+                        "value": "3m",
+                        "description": "Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode)."
+                    },
+                    {
+                        "macro": "{$CPU.UTIL.CRIT}",
+                        "value": "90"
+                    },
+                    {
+                        "macro": "{$IF.ERRORS.WARN}",
+                        "value": "2"
+                    },
+                    {
+                        "macro": "{$IF.UTIL.MAX}",
+                        "value": "90",
+                        "description": "This macro is used as a threshold in the interface utilization trigger."
+                    },
+                    {
+                        "macro": "{$IFCONTROL}",
+                        "value": "1"
+                    },
+                    {
+                        "macro": "{$KERNEL.MAXFILES.MIN}",
+                        "value": "256"
+                    },
+                    {
+                        "macro": "{$KERNEL.MAXPROC.MIN}",
+                        "value": "1024"
+                    },
+                    {
+                        "macro": "{$LOAD_AVG_PER_CPU.MAX.WARN}",
+                        "value": "1.5",
+                        "description": "The CPU load per core is considered sustainable. If necessary, it can be tuned."
+                    },
+                    {
+                        "macro": "{$MEMORY.AVAILABLE.MIN}",
+                        "value": "20M",
+                        "description": "This macro is used as a threshold in the memory available trigger."
+                    },
+                    {
+                        "macro": "{$MEMORY.UTIL.MAX}",
+                        "value": "90",
+                        "description": "This macro is used as a threshold in the memory utilization trigger."
+                    },
+                    {
+                        "macro": "{$NET.IF.IFNAME.MATCHES}",
+                        "value": "^.*$"
+                    },
+                    {
+                        "macro": "{$NET.IF.IFNAME.NOT_MATCHES}",
+                        "value": "(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})",
+                        "description": "It filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default."
+                    },
+                    {
+                        "macro": "{$SWAP.PFREE.MIN.WARN}",
+                        "value": "50"
+                    },
+                    {
+                        "macro": "{$SYSTEM.FUZZYTIME.MAX}",
+                        "value": "60"
+                    },
+                    {
+                        "macro": "{$VFS.DEV.DEVNAME.MATCHES}",
+                        "value": ".+",
+                        "description": "This macro is used for a discovery of block devices. It can be overridden on host level or its linked template level."
+                    },
+                    {
+                        "macro": "{$VFS.DEV.DEVNAME.NOT_MATCHES}",
+                        "value": "^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)",
+                        "description": "This macro is used for a discovery of block devices. It can be overridden on host level or its linked template level."
+                    },
+                    {
+                        "macro": "{$VFS.DEV.READ.AWAIT.WARN}",
+                        "value": "20",
+                        "description": "The average response time (in ms) of disk read before the trigger would fire."
+                    },
+                    {
+                        "macro": "{$VFS.DEV.WRITE.AWAIT.WARN}",
+                        "value": "20",
+                        "description": "The average response time (in ms) of disk write before the trigger would fire."
+                    },
+                    {
+                        "macro": "{$VFS.FS.FREE.MIN.CRIT}",
+                        "value": "5G",
+                        "description": "The critical threshold for utilization of the filesystem."
+                    },
+                    {
+                        "macro": "{$VFS.FS.FREE.MIN.WARN}",
+                        "value": "10G",
+                        "description": "The warning threshold for utilization of the filesystem."
+                    },
+                    {
+                        "macro": "{$VFS.FS.FSNAME.MATCHES}",
+                        "value": ".+",
+                        "description": "This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level."
+                    },
+                    {
+                        "macro": "{$VFS.FS.FSNAME.NOT_MATCHES}",
+                        "value": "^(/dev|/sys|/run|/proc|.+/shm$)",
+                        "description": "This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level."
+                    },
+                    {
+                        "macro": "{$VFS.FS.FSTYPE.MATCHES}",
+                        "value": "^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$",
+                        "description": "This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level."
+                    },
+                    {
+                        "macro": "{$VFS.FS.FSTYPE.NOT_MATCHES}",
+                        "value": "^\\s$",
+                        "description": "This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level."
+                    },
+                    {
+                        "macro": "{$VFS.FS.INODE.PFREE.MIN.CRIT}",
+                        "value": "10",
+                        "description": "The critical threshold of the filesystem metadata utilization."
+                    },
+                    {
+                        "macro": "{$VFS.FS.INODE.PFREE.MIN.WARN}",
+                        "value": "20",
+                        "description": "The warning threshold of the filesystem metadata utilization."
+                    },
+                    {
+                        "macro": "{$VFS.FS.PUSED.MAX.CRIT}",
+                        "value": "90",
+                        "description": "The critical threshold of the filesystem utilization."
+                    },
+                    {
+                        "macro": "{$VFS.FS.PUSED.MAX.WARN}",
+                        "value": "80",
+                        "description": "The warning threshold of the filesystem utilization."
+                    }
+                ],
+                "valuemaps": [
+                    {
+                        "uuid": "202d1431ba45494bb2774c1356d88b48",
+                        "name": "ifOperStatus",
+                        "mappings": [
+                            {
+                                "value": "0",
+                                "newvalue": "unknown"
+                            },
+                            {
+                                "value": "1",
+                                "newvalue": "notpresent"
+                            },
+                            {
+                                "value": "2",
+                                "newvalue": "down"
+                            },
+                            {
+                                "value": "3",
+                                "newvalue": "lowerlayerdown"
+                            },
+                            {
+                                "value": "4",
+                                "newvalue": "testing"
+                            },
+                            {
+                                "value": "5",
+                                "newvalue": "dormant"
+                            },
+                            {
+                                "value": "6",
+                                "newvalue": "up"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "1def873e44de4a0fb244825206f7f235",
+                        "name": "Linux::Interface protocol types",
+                        "mappings": [
+                            {
+                                "value": "0",
+                                "newvalue": "from KA9Q: NET/ROM pseudo"
+                            },
+                            {
+                                "value": "1",
+                                "newvalue": "Ethernet"
+                            },
+                            {
+                                "value": "2",
+                                "newvalue": "Experimental Ethernet"
+                            },
+                            {
+                                "value": "3",
+                                "newvalue": "AX.25 Level 2"
+                            },
+                            {
+                                "value": "4",
+                                "newvalue": "PROnet token ring"
+                            },
+                            {
+                                "value": "5",
+                                "newvalue": "Chaosnet"
+                            },
+                            {
+                                "value": "6",
+                                "newvalue": "IEEE 802.2 Ethernet/TR/TB"
+                            },
+                            {
+                                "value": "7",
+                                "newvalue": "ARCnet"
+                            },
+                            {
+                                "value": "8",
+                                "newvalue": "APPLEtalk"
+                            },
+                            {
+                                "value": "15",
+                                "newvalue": "Frame Relay DLCI"
+                            },
+                            {
+                                "value": "19",
+                                "newvalue": "ATM"
+                            },
+                            {
+                                "value": "23",
+                                "newvalue": "Metricom STRIP (new IANA id)"
+                            },
+                            {
+                                "value": "24",
+                                "newvalue": "IEEE 1394 IPv4 - RFC 2734"
+                            },
+                            {
+                                "value": "27",
+                                "newvalue": "EUI-64"
+                            },
+                            {
+                                "value": "32",
+                                "newvalue": "InfiniBand"
+                            },
+                            {
+                                "value": "256",
+                                "newvalue": "ARPHRD_SLIP"
+                            },
+                            {
+                                "value": "257",
+                                "newvalue": "ARPHRD_CSLIP"
+                            },
+                            {
+                                "value": "258",
+                                "newvalue": "ARPHRD_SLIP6"
+                            },
+                            {
+                                "value": "259",
+                                "newvalue": "ARPHRD_CSLIP6"
+                            },
+                            {
+                                "value": "260",
+                                "newvalue": "Notional KISS type"
+                            },
+                            {
+                                "value": "264",
+                                "newvalue": "ARPHRD_ADAPT"
+                            },
+                            {
+                                "value": "270",
+                                "newvalue": "ARPHRD_ROSE"
+                            },
+                            {
+                                "value": "271",
+                                "newvalue": "CCITT X.25"
+                            },
+                            {
+                                "value": "272",
+                                "newvalue": "Boards with X.25 in firmware"
+                            },
+                            {
+                                "value": "280",
+                                "newvalue": "Controller Area Network"
+                            },
+                            {
+                                "value": "512",
+                                "newvalue": "ARPHRD_PPP"
+                            },
+                            {
+                                "value": "513",
+                                "newvalue": "Cisco HDLC"
+                            },
+                            {
+                                "value": "516",
+                                "newvalue": "LAPB"
+                            },
+                            {
+                                "value": "517",
+                                "newvalue": "Digital's DDCMP protocol"
+                            },
+                            {
+                                "value": "518",
+                                "newvalue": "Raw HDLC"
+                            },
+                            {
+                                "value": "519",
+                                "newvalue": "Raw IP"
+                            },
+                            {
+                                "value": "768",
+                                "newvalue": "IPIP tunnel"
+                            },
+                            {
+                                "value": "769",
+                                "newvalue": "IP6IP6 tunnel"
+                            },
+                            {
+                                "value": "770",
+                                "newvalue": "Frame Relay Access Device"
+                            },
+                            {
+                                "value": "771",
+                                "newvalue": "SKIP vif"
+                            },
+                            {
+                                "value": "772",
+                                "newvalue": "Loopback device"
+                            },
+                            {
+                                "value": "773",
+                                "newvalue": "Localtalk device"
+                            },
+                            {
+                                "value": "774",
+                                "newvalue": "Fiber Distributed Data Interface"
+                            },
+                            {
+                                "value": "775",
+                                "newvalue": "AP1000 BIF"
+                            },
+                            {
+                                "value": "776",
+                                "newvalue": "sit0 device - IPv6-in-IPv4"
+                            },
+                            {
+                                "value": "777",
+                                "newvalue": "IP over DDP tunneller"
+                            },
+                            {
+                                "value": "778",
+                                "newvalue": "GRE over IP"
+                            },
+                            {
+                                "value": "779",
+                                "newvalue": "PIMSM register interface"
+                            },
+                            {
+                                "value": "780",
+                                "newvalue": "High Performance Parallel Interface"
+                            },
+                            {
+                                "value": "781",
+                                "newvalue": "Nexus 64Mbps Ash"
+                            },
+                            {
+                                "value": "782",
+                                "newvalue": "Acorn Econet"
+                            },
+                            {
+                                "value": "783",
+                                "newvalue": "Linux-IrDA"
+                            },
+                            {
+                                "value": "784",
+                                "newvalue": "Point to point fibrechannel"
+                            },
+                            {
+                                "value": "785",
+                                "newvalue": "Fibrechannel arbitrated loop"
+                            },
+                            {
+                                "value": "786",
+                                "newvalue": "Fibrechannel public loop"
+                            },
+                            {
+                                "value": "787",
+                                "newvalue": "Fibrechannel fabric"
+                            },
+                            {
+                                "value": "800",
+                                "newvalue": "Magic type ident for TR"
+                            },
+                            {
+                                "value": "801",
+                                "newvalue": "IEEE 802.11"
+                            },
+                            {
+                                "value": "802",
+                                "newvalue": "IEEE 802.11 + Prism2 header"
+                            },
+                            {
+                                "value": "803",
+                                "newvalue": "IEEE 802.11 + radiotap header"
+                            },
+                            {
+                                "value": "804",
+                                "newvalue": "ARPHRD_IEEE802154"
+                            },
+                            {
+                                "value": "805",
+                                "newvalue": "IEEE 802.15.4 network monitor"
+                            },
+                            {
+                                "value": "820",
+                                "newvalue": "PhoNet media type"
+                            },
+                            {
+                                "value": "821",
+                                "newvalue": "PhoNet pipe header"
+                            },
+                            {
+                                "value": "822",
+                                "newvalue": "CAIF media type"
+                            },
+                            {
+                                "value": "823",
+                                "newvalue": "GRE over IPv6"
+                            },
+                            {
+                                "value": "824",
+                                "newvalue": "Netlink header"
+                            },
+                            {
+                                "value": "825",
+                                "newvalue": "IPv6 over LoWPAN"
+                            },
+                            {
+                                "value": "826",
+                                "newvalue": "Vsock monitor header"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "adf92ef46d95463f9d43ada2acce273c",
+                        "name": "zabbix.host.available",
+                        "mappings": [
+                            {
+                                "value": "0",
+                                "newvalue": "not available"
+                            },
+                            {
+                                "value": "1",
+                                "newvalue": "available"
+                            },
+                            {
+                                "value": "2",
+                                "newvalue": "unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "a3bb35f7b8074d24a54d1efa3d640e60",
+                        "name": "Zabbix agent ping status",
+                        "mappings": [
+                            {
+                                "value": "1",
+                                "newvalue": "Up"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "triggers": [
+            {
+                "uuid": "415269817ada49ec9907283f8d7d4d83",
+                "expression": "last(/Linux server by admin/proc.num)/last(/Linux server by admin/kernel.maxproc)*100>80",
+                "name": "Linux: Getting closer to process limit",
+                "event_name": "Linux: Getting closer to process limit (over 80% used)",
+                "opdata": "{ITEM.LASTVALUE1} active, {ITEM.LASTVALUE2} limit.",
+                "priority": "WARNING",
+                "tags": [
+                    {
+                        "tag": "scope",
+                        "value": "performance"
+                    }
+                ]
+            },
+            {
+                "uuid": "c84babff1fc746f596f271e5b7c90b28",
+                "expression": "max(/Linux server by admin/system.swap.size[,pfree],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux server by admin/system.swap.size[,total])>0",
+                "name": "Linux: High swap space usage",
+                "event_name": "Linux: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)",
+                "opdata": "Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}",
+                "priority": "WARNING",
+                "description": "If there is no swap configured, this trigger is ignored.",
+                "dependencies": [
+                    {
+                        "name": "Linux: High memory utilization",
+                        "expression": "min(/Linux server by admin/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}"
+                    },
+                    {
+                        "name": "Linux: Lack of available memory",
+                        "expression": "max(/Linux server by admin/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux server by admin/vm.memory.size[total])>0"
+                    }
+                ],
+                "tags": [
+                    {
+                        "tag": "scope",
+                        "value": "capacity"
+                    }
+                ]
+            },
+            {
+                "uuid": "82cd3b8d8f0642d18aa54458067a610f",
+                "expression": "max(/Linux server by admin/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux server by admin/vm.memory.size[total])>0",
+                "name": "Linux: Lack of available memory",
+                "event_name": "Linux: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})",
+                "opdata": "Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}",
+                "priority": "AVERAGE",
+                "tags": [
+                    {
+                        "tag": "scope",
+                        "value": "capacity"
+                    },
+                    {
+                        "tag": "scope",
+                        "value": "performance"
+                    }
+                ]
+            },
+            {
+                "uuid": "fd31dd6ebd6046da8a8d51ff2f78c6b5",
+                "expression": "min(/Linux server by admin/system.cpu.load[avg1],5m)/last(/Linux server by admin/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}\nand last(/Linux server by admin/system.cpu.load[avg5])>0\nand last(/Linux server by admin/system.cpu.load[avg15])>0",
+                "name": "Linux: Load average is too high",
+                "event_name": "Linux: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)",
+                "opdata": "Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}",
+                "priority": "AVERAGE",
+                "description": "The load average per CPU is too high. The system may be slow to respond.",
+                "tags": [
+                    {
+                        "tag": "scope",
+                        "value": "capacity"
+                    },
+                    {
+                        "tag": "scope",
+                        "value": "performance"
+                    }
+                ]
+            }
+        ],
+        "graphs": [
+            {
+                "uuid": "d457c89c99e8417e9152fd11288bb839",
+                "name": "CPU temp",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "percent_left": "20",
+                "percent_right": "20",
+                "graph_items": [
+                    {
+                        "color": "1A7C11",
+                        "calc_fnc": "ALL",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.temperature"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "fe63ec94ee674c92a6b50f2548b7e72c",
+                "name": "CPU utilization",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "graph_items": [
+                    {
+                        "drawtype": "FILLED_REGION",
+                        "color": "1A7C11",
+                        "calc_fnc": "ALL",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "54b2728ab8bf4418b356d6f9f82932c8",
+                "name": "Linux: CPU jumps",
+                "graph_items": [
+                    {
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.switches"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.intr"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "bd7ea9af0c2e4ad3ad5faecd7aba0f37",
+                "name": "Linux: CPU usage",
+                "type": "STACKED",
+                "ymin_type_1": "FIXED",
+                "ymax_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util[,system]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util[,user]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "00611C",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util[,nice]"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "F7941D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util[,iowait]"
+                        }
+                    },
+                    {
+                        "sortorder": "4",
+                        "color": "FC6EA3",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util[,steal]"
+                        }
+                    },
+                    {
+                        "sortorder": "5",
+                        "color": "6C59DC",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util[,interrupt]"
+                        }
+                    },
+                    {
+                        "sortorder": "6",
+                        "color": "C7A72D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util[,softirq]"
+                        }
+                    },
+                    {
+                        "sortorder": "7",
+                        "color": "BA2A5D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util[,guest]"
+                        }
+                    },
+                    {
+                        "sortorder": "8",
+                        "color": "F230E0",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.util[,guest_nice]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "572535e1bf18470581bb75c3b0e0e1c1",
+                "name": "Linux: Memory usage",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "drawtype": "BOLD_LINE",
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "vm.memory.size[total]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "drawtype": "GRADIENT_LINE",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "vm.memory.size[available]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "62f9da0c633b43ebb76c59d58392bcf4",
+                "name": "Linux: Memory utilization",
+                "ymin_type_1": "FIXED",
+                "ymax_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "drawtype": "GRADIENT_LINE",
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "vm.memory.utilization"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "6a65945344ec404c982da55aec971e31",
+                "name": "Linux: Processes",
+                "graph_items": [
+                    {
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "proc.num"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "proc.num[,,run]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "c94880aefc7142139b5c0b632976aa56",
+                "name": "Linux: Swap usage",
+                "graph_items": [
+                    {
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.swap.size[,free]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.swap.size[,total]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "9d86651f6f1a4e75aede2293e00b851a",
+                "name": "Linux: System load",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "graph_items": [
+                    {
+                        "drawtype": "BOLD_LINE",
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.load[avg1]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.load[avg5]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "673AB7",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "system.cpu.load[avg15]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "1abf3c24b43444209c3bebe389976042",
+                "name": "TCP connection",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "graph_items": [
+                    {
+                        "color": "1A7C11",
+                        "calc_fnc": "MIN",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "net.tcp[ESTABLISHED]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "FF5722",
+                        "calc_fnc": "MIN",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "net.tcp[LISTEN]"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
