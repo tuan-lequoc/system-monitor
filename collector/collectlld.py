@@ -60,10 +60,22 @@ def get_network_interface_names():
 
     return filtered_interfaces
 
+def get_mount_point():
+    partitions = psutil.disk_partitions(all=False)
+    mount_point_arr = []
+
+    for partition in partitions:
+        if partition.mountpoint.startswith(('/boot', '/snap', '/var')):
+            continue
+        partition_name = partition.mountpoint
+        mount_point_arr.append({"{#FSNAME}": partition_name})
+    
+    return mount_point_arr
 
 def get_all_lld():
     llds = []
     llds.append({"net.if.discovery": get_network_interface_names()})
+    llds.append({"vfs.fs.dependent.discovery": get_mount_point()})
     return llds
 
 def generate_lld_payload(llds):
@@ -81,6 +93,6 @@ def generate_lld_payload(llds):
 
 llds = get_all_lld()
 payload = generate_lld_payload(llds)
-print(payload)
+# print(payload)
 
-# send_llds('localhost', 10051, payload)
+send_llds('localhost', 10051, payload)
