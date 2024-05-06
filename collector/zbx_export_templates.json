@@ -637,6 +637,22 @@
                         ]
                     },
                     {
+                        "uuid": "9470b248e02d4bdcae65504b3945bcde",
+                        "name": "Linux: memory cached",
+                        "type": "TRAP",
+                        "key": "vm.memory.size[cached]",
+                        "delay": "0",
+                        "units": "B"
+                    },
+                    {
+                        "uuid": "b4c1f2de7e014fd7bd3ea16b2ec14629",
+                        "name": "Linux: memory free",
+                        "type": "TRAP",
+                        "key": "vm.memory.size[free]",
+                        "delay": "0",
+                        "units": "B"
+                    },
+                    {
                         "uuid": "07c4e3735b654141985be940059cb102",
                         "name": "Linux: Available memory in %",
                         "type": "TRAP",
@@ -669,6 +685,14 @@
                                 "value": "memory"
                             }
                         ]
+                    },
+                    {
+                        "uuid": "8ca8bc3d7ee842d19eafd5c39d2232bb",
+                        "name": "Linux: memory used",
+                        "type": "TRAP",
+                        "key": "vm.memory.size[used]",
+                        "delay": "0",
+                        "units": "B"
                     },
                     {
                         "uuid": "2bafa0ce55074078bd43e738ad95c222",
@@ -737,12 +761,13 @@
                                 "type": "TRAP",
                                 "key": "net.if.in[{#IFNAME}]",
                                 "delay": "0",
-                                "units": "kbps",
+                                "value_type": "FLOAT",
+                                "units": "Mbps",
                                 "preprocessing": [
                                     {
                                         "type": "JAVASCRIPT",
                                         "parameters": [
-                                            "return value * (1 / Math.pow(10, 3));"
+                                            "return value * (1 / Math.pow(10, 6));"
                                         ]
                                     }
                                 ]
@@ -753,12 +778,13 @@
                                 "type": "TRAP",
                                 "key": "net.if.out[{#IFNAME}]",
                                 "delay": "0",
-                                "units": "kpps",
+                                "value_type": "FLOAT",
+                                "units": "Mpps",
                                 "preprocessing": [
                                     {
                                         "type": "JAVASCRIPT",
                                         "parameters": [
-                                            "return -1 * value * (1 / Math.pow(10, 3));"
+                                            "return -1 * value * (1 / Math.pow(10, 6));"
                                         ]
                                     }
                                 ]
@@ -770,7 +796,152 @@
                         "name": "Mounted filesystem discovery",
                         "type": "TRAP",
                         "key": "vfs.fs.dependent.discovery",
-                        "delay": "0"
+                        "delay": "0",
+                        "item_prototypes": [
+                            {
+                                "uuid": "5b01f84156d149abbeaa9232fdb90faa",
+                                "name": "IO stats read {#FSNAME}",
+                                "type": "TRAP",
+                                "key": "vfs.dev.read_bytes[{#FSNAME}]",
+                                "delay": "0",
+                                "value_type": "FLOAT",
+                                "units": "MBps",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return value * (1 / Math.pow(10, 6));"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "4320d7e22de24f829e0f001a42cd0fc8",
+                                "name": "IO stats write {#FSNAME}",
+                                "type": "TRAP",
+                                "key": "vfs.dev.write_bytes[{#FSNAME}]",
+                                "delay": "0",
+                                "value_type": "FLOAT",
+                                "units": "MBps",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return value * (1 / Math.pow(10, 6));"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "de3c655d48d94928914485007f2d2ef5",
+                                "name": "Disk size {#FSNAME}",
+                                "type": "TRAP",
+                                "key": "vfs.fs.size[{#FSNAME},total]",
+                                "delay": "0",
+                                "value_type": "FLOAT",
+                                "units": "Gb",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return value * (1 / Math.pow(10, 9));"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "f20b3b661996472598a77bcb4c38d52c",
+                                "name": "Disk used {#FSNAME}",
+                                "type": "TRAP",
+                                "key": "vfs.fs.size[{#FSNAME},used]",
+                                "delay": "0",
+                                "value_type": "FLOAT",
+                                "units": "Gb",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return value * (1 / Math.pow(10, 9));"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "76efc7ddf6254f53b0b4eb81e72dbeb4",
+                                "name": "Disk utilization {#FSNAME}",
+                                "type": "TRAP",
+                                "key": "vfs.fs.utilization[{#FSNAME}]",
+                                "delay": "0",
+                                "value_type": "FLOAT",
+                                "units": "%"
+                            }
+                        ],
+                        "graph_prototypes": [
+                            {
+                                "uuid": "a73897cbdd3e479787b100583096040a",
+                                "name": "Disk usage {#FSNAME}",
+                                "show_work_period": "NO",
+                                "show_triggers": "NO",
+                                "graph_items": [
+                                    {
+                                        "color": "0080FF",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Linux server by admin",
+                                            "key": "vfs.fs.size[{#FSNAME},total]"
+                                        }
+                                    },
+                                    {
+                                        "sortorder": "1",
+                                        "color": "FF4000",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Linux server by admin",
+                                            "key": "vfs.fs.size[{#FSNAME},used]"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "f42c7a826dd34fca85fa8189221bce04",
+                                "name": "Disk utilization {#FSNAME}",
+                                "show_work_period": "NO",
+                                "show_triggers": "NO",
+                                "graph_items": [
+                                    {
+                                        "color": "1A7C11",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Linux server by admin",
+                                            "key": "vfs.fs.utilization[{#FSNAME}]"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "4c814ab1ec3346d0b5b2db1f811f153c",
+                                "name": "IO stats {#FSNAME}",
+                                "show_work_period": "NO",
+                                "show_triggers": "NO",
+                                "graph_items": [
+                                    {
+                                        "color": "1A7C11",
+                                        "item": {
+                                            "host": "Linux server by admin",
+                                            "key": "vfs.dev.read_bytes[{#FSNAME}]"
+                                        }
+                                    },
+                                    {
+                                        "sortorder": "1",
+                                        "color": "274482",
+                                        "item": {
+                                            "host": "Linux server by admin",
+                                            "key": "vfs.dev.write_bytes[{#FSNAME}]"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "tags": [
@@ -1570,6 +1741,41 @@
                         "item": {
                             "host": "Linux server by admin",
                             "key": "system.cpu.load[avg15]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "d48cb744a2224e7aa6b2efc915e25b3c",
+                "name": "Memory size",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "type": "STACKED",
+                "graph_items": [
+                    {
+                        "color": "1A7C11",
+                        "calc_fnc": "MIN",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "vm.memory.size[cached]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "274482",
+                        "calc_fnc": "MIN",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "vm.memory.size[free]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "F63100",
+                        "calc_fnc": "MIN",
+                        "item": {
+                            "host": "Linux server by admin",
+                            "key": "vm.memory.size[used]"
                         }
                     }
                 ]

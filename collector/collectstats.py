@@ -8,8 +8,11 @@ import collections
 import subprocess
 import socket
 import struct
+import time
 
 hostname = socket.gethostname()
+prev_io_stats = {}
+prev_net_stats = {}
 
 def send_metric(server, port, listdata):
     # Create socket
@@ -79,8 +82,43 @@ def collect_memory_stats():
         'vm.memory.size[cached]': cached_ram
     }
 
+# def collect_disk_stats():
+#     disk_stats = {}
+
+#     # Get disk partitions
+#     partitions = psutil.disk_partitions(all=False)
+
+#     # Iterate over disk partitions
+#     for partition in partitions:
+#         if partition.mountpoint.startswith(('/boot', '/snap', '/var')):
+#             continue
+#         partition_name = partition.mountpoint
+#         disk_usage = psutil.disk_usage(partition_name)
+#         disk_stats[f'vfs.fs.size[{partition_name},total]'] = disk_usage.total
+#         disk_stats[f'vfs.fs.size[{partition_name},used]'] = disk_usage.used
+#         disk_stats[f'vfs.fs.size[{partition_name},free]'] = disk_usage.free
+#         disk_stats[f'vfs.fs.utilization[{partition_name}]'] = disk_usage.percent
+#         # Get disk I/O statistics
+#         io_counters = psutil.disk_io_counters(perdisk=True).get(partition.device.split('/')[-1])
+#         if io_counters:
+#             disk_stats[f'vfs.dev.read_bytes[{partition_name}]'] = io_counters.read_bytes
+#             disk_stats[f'vfs.dev.write_bytes[{partition_name}]'] = io_counters.write_bytes
+
+#     return disk_stats
+
+# def collect_network_stats():
+#     net_stats = {}
+#     for interface, stats in psutil.net_io_counters(pernic=True).items():
+#         if interface.startswith(('eth', 'wl')):  # Filter Ethernet and Wireless LAN interfaces
+#             net_stats[f'net.if.in[{interface}]'] = stats.bytes_recv
+#             net_stats[f'net.if.out[{interface}]'] = stats.bytes_sent
+#     return net_stats
+
 def collect_disk_stats():
+    global prev_io_stats
+    
     disk_stats = {}
+    current_time = time.time()
 
     # Get disk partitions
     partitions = psutil.disk_partitions(all=False)
@@ -98,17 +136,53 @@ def collect_disk_stats():
         # Get disk I/O statistics
         io_counters = psutil.disk_io_counters(perdisk=True).get(partition.device.split('/')[-1])
         if io_counters:
-            disk_stats[f'vfs.dev.read_bytes[{partition_name}]'] = io_counters.read_bytes
-            disk_stats[f'vfs.dev.write_bytes[{partition_name}]'] = io_counters.write_bytes
+            # Calculate bytes per second for read and write operations
+            if partition_name in prev_io_stats:
+                prev_read_bytes, prev_write_bytes, prev_time = prev_io_stats[partition_name]
+                time_difference = current_time - prev_time
+                read_bytes_per_sec = (io_counters.read_bytes - prev_read_bytes) / time_difference
+                write_bytes_per_sec = (io_counters.write_bytes - prev_write_bytes) / time_difference
+            else:
+                read_bytes_per_sec = 0
+                write_bytes_per_sec = 0
+            
+            # Update previous stats
+            prev_io_stats[partition_name] = (io_counters.read_bytes, io_counters.write_bytes, current_time)
+            
+            # Store current stats
+            disk_stats[f'vfs.dev.read_bytes[{partition_name}]'] = read_bytes_per_sec
+            disk_stats[f'vfs.dev.write_bytes[{partition_name}]'] = write_bytes_per_sec
 
     return disk_stats
 
 def collect_network_stats():
+    global prev_net_stats
+    
     net_stats = {}
+    current_time = time.time()
+    
     for interface, stats in psutil.net_io_counters(pernic=True).items():
         if interface.startswith(('eth', 'wl')):  # Filter Ethernet and Wireless LAN interfaces
-            net_stats[f'net.if.in[{interface}]'] = stats.bytes_recv
-            net_stats[f'net.if.out[{interface}]'] = stats.bytes_sent
+            bytes_recv = stats.bytes_recv
+            bytes_sent = stats.bytes_sent
+            
+            # Calculate bytes per second
+            if interface in prev_net_stats:
+                prev_bytes_recv, prev_bytes_sent, prev_time = prev_net_stats[interface]
+                time_difference = current_time - prev_time
+                bytes_recv_per_sec = (bytes_recv - prev_bytes_recv) / time_difference
+                bytes_sent_per_sec = (bytes_sent - prev_bytes_sent) / time_difference
+            else:
+                bytes_recv_per_sec = 0
+                bytes_sent_per_sec = 0
+            
+            # Update previous stats
+            prev_net_stats[interface] = (bytes_recv, bytes_sent, current_time)
+            
+            # Store current stats
+            net_stats[f'net.if.in[{interface}]'] = bytes_recv_per_sec
+            net_stats[f'net.if.out[{interface}]'] = bytes_sent_per_sec
+    
     return net_stats
 
 def collect_tcp_stats():
@@ -143,24 +217,27 @@ def collect_system_stats():
     stats.update(collect_temperature())
     return stats
 
-# Collect system statistics
-system_stats = collect_system_stats()
 
-# Format statistics as Zabbix trap items
-zabbix_trap_items = []
-for key, value in system_stats.items():
-    trap_item = {
-        "host": hostname,
-        "key": key,
-        "value": str(value)
-    }
-    zabbix_trap_items.append(trap_item)
+while True:
+    # Collect system statistics
+    system_stats = collect_system_stats()
 
-# Convert trap items to JSON
-json_trap_items = json.dumps(zabbix_trap_items, indent=4)
+    # Format statistics as Zabbix trap items
+    zabbix_trap_items = []
+    for key, value in system_stats.items():
+        trap_item = {
+            "host": hostname,
+            "key": key,
+            "value": str(value)
+        }
+        zabbix_trap_items.append(trap_item)
 
-# Print JSON string
-print("Zabbix Trap Items (JSON):")
-print(json_trap_items)
+    # # Convert trap items to JSON
+    # json_trap_items = json.dumps(zabbix_trap_items, indent=4)
 
-# send_metric('localhost', 10051, zabbix_trap_items)
+    # # Print JSON string
+    # print("Zabbix Trap Items (JSON):")
+    # print(json_trap_items)
+
+    send_metric('localhost', 10051, zabbix_trap_items)
+    time.sleep(60)
