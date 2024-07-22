@@ -1,3 +1,3 @@
-tls/certificate.crt
-tls/csr.pem
-tls/zabbix.key
+**/certificate.crt
+**/tls/csr.pem
+**/tls/zabbix.key
