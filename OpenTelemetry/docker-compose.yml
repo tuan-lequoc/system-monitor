@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    # ports:
+    #   - "8086:8086"
+    networks:
+      - observability
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    user: "root"
+    ports:
+      - "5000:3000"
+    networks:
+      - observability
+    depends_on:
+      - influxdb
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana.ini:/etc/grafana/grafana.ini
+      - ./certs/grafana.crt:/etc/grafana/certs/grafana.crt
+      - ./certs/grafana.key:/etc/grafana/certs/grafana.key
+
+  opentelemetry_collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: opentelemetry_collector
+    # ports:
+      # - "4317:4317"  # OTLP gRPC (Traces and Metrics)
+      # - "55681:55681"  # OTLP HTTP (Traces and Metrics)
+      # - "8888:8888"  # Metrics endpoint (if needed)
+    volumes:
+      - ./otel-collector-config.yml:/otel-config.yaml
+    networks:
+      - observability
+
+networks:
+  observability:
+    driver: bridge
+
+volumes:
+  influxdb-data:
+    driver_opts:
+      type: none
+      device: /data1/influxdb-monitor-data
+      o: bind
+  grafana-data:
+    driver_opts:
+      type: none
+      device: /data1/grafana-data
+      o: bind

@@ -1,0 +1,29 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:55681"
+
+processors:
+  batch:
+
+exporters:
+  influxdb:
+    endpoint: "http://influxdb:8086"
+    database: "metrics_db"
+    retention_policy: "autogen"
+    username: "admin"
+    password: "admin"
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [influxdb]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [influxdb]
